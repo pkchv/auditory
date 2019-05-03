@@ -1,0 +1,18 @@
+{
+  "name": "auditory",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "(cd ./server && npm run build); (cd ./client && npm run build)",
+    "postinstall": "cd ./server && npm install; cd ../client && npm install;",
+    "start:dev:server": "cd ./server && nodemon",
+    "start:dev:client": "cd ./client && npm run start",
+    "clean": "rm -rf ./build"
+  },
+  "author": "Kamil Sieniawski <kamil.sieniawski@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "sillyname": "^0.1.0"
+  }
+}

@@ -1,0 +1,16 @@
+/* Fullscreen, no scrollbars */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+/* Fullscreen render with disabled default browser touchscreen controls (control signals should be handled by babylon) */
+#render {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
