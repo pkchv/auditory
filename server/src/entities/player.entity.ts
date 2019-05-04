@@ -1,6 +1,6 @@
 import { Schema, type } from '@colyseus/schema';
 import { generate } from 'short-uuid';
-import { generateName } from 'sillyname';
+import { generate as name } from 'namor';
 
 import { Model } from './model.entity';
 
@@ -13,7 +13,7 @@ export class Player extends Schema {
     uuid: string = generate();
 
     @type('string')
-    name: string = generateName();
+    name: string = name({ word: 2, numbers: 0 });
 
     @type(Model)
     model: Model;

@@ -76,6 +76,7 @@
   },
   "version": "0.0.1",
   "dependencies": {
-    "babylonjs": "^4.0.0-beta.5"
+    "babylonjs": "^4.0.0-beta.5",
+    "colyseus.js": "^0.10.5"
   }
 }

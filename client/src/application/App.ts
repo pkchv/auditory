@@ -1,18 +1,27 @@
-import { Engine, Camera, UniversalCamera, HemisphericLight, Light, MeshBuilder, Scene, Vector3 } from "babylonjs";
+import { Engine, HemisphericLight, Light, MeshBuilder, Scene, UniversalCamera, Vector3 } from 'babylonjs';
 
-import { Assets } from "./Assets";
+import { Assets } from './Assets';
+import { IConfig } from './Config';
+import {IFeatures } from './Features';
+import { Network } from './Network';
 
 export class App {
+    private config: IConfig;
+    private features: IFeatures;
     private canvas: HTMLCanvasElement;
     private engine: Engine;
     private scene: Scene;
     private camera: UniversalCamera;
+    private network: Network;
     private light: Light;
     private assets: Assets;
 
-    constructor(element: string) {
+    constructor(element: string, config: IConfig, features: IFeatures) {
         this.canvas = <HTMLCanvasElement> document.getElementById(element);
         this.engine = new Engine(this.canvas, true);
+        this.network = new Network(config.server);
+        this.config = config;
+        this.features = features;
     }
 
     initialize(): void {
@@ -35,9 +44,7 @@ export class App {
         sphere.position.y = 2;
 
         // create a built-in "ground" shape
-        let ground = MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 64}, this.scene);
-
-        ground.position.z = -10;
+        MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 64}, this.scene);
     }
 
     resize(): void {

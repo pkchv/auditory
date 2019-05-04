@@ -1,14 +1,16 @@
 import { Logger } from '@nestjs/common';
 import { Client, Room } from 'colyseus';
 
-import { Player } from '../entities/player.entity';
 import { UniverseStateHandler } from './state-handlers/universe.state-handler';
+import { Universe } from 'src/entities/universe.entity';
 
-export class GameRoom extends Room<UniverseStateHandler> {
+export class GameRoom extends Room<Universe> {
 
     private readonly logger: Logger = new Logger(GameRoom.name);
 
     maxClients: number = 8;
+    state: Universe;
+    handler: UniverseStateHandler;
 
     onInit(options) {
         if (options.maxClients !== undefined) {
@@ -16,7 +18,9 @@ export class GameRoom extends Room<UniverseStateHandler> {
         }
 
         this.setSimulationInterval(() => this.onUpdate());
-        this.setState(new UniverseStateHandler());
+        this.state = new Universe();
+        this.handler = new UniverseStateHandler(this.state);
+        this.setState(this.state);
     }
 
     requestJoin(options) {
@@ -24,21 +28,21 @@ export class GameRoom extends Room<UniverseStateHandler> {
     }
 
     onJoin(client) {
-        this.state.players.create(client.id);
+        this.handler.players.create(client.id);
     }
 
     onMessage(client: Client, data: any) {
-        const player = this.state.players.read(client.id);
+        const player = this.handler.players.read(client.id);
         const serialized = JSON.stringify(data);
         this.logger.debug(`[${client.id}] [${player.name}] ${serialized}`);
     }
 
     onUpdate() {
-        this.state.update();
+        this.handler.update();
     }
 
     onLeave(client) {
-        this.state.players.remove(client.id);
+        this.handler.players.remove(client.id);
     }
 
     onDispose() {

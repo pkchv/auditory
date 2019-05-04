@@ -24,8 +24,9 @@ export class ColyseusService implements OnModuleInit, OnModuleDestroy, OnApplica
   }
 
   onModuleInit() {
-    this.registerDefaultRoom();
-    const port = this.config.get('game-server.port') || 8081;
+    const port = this.config.get('game-server.port', 8081);
+    const id = this.config.get('room.name', 'default');
+    this.registerDefaultRoom(id);
     this.logger.log(`Game server listens on port ${port}`);
     this.server.listen(port);
   }
@@ -37,8 +38,7 @@ export class ColyseusService implements OnModuleInit, OnModuleDestroy, OnApplica
     return this.server.register(id, handler, options);
   }
 
-  private registerDefaultRoom() {
-    const id = generateRoomId({ manly: true, words: 2, numbers: 2 });
+  private registerDefaultRoom(id) {
     const options = Object.assign({ id }, this.config.get('room'));
     this.register(id, GameRoom, options);
   }

@@ -20,8 +20,8 @@ export class UniverseStateHandler {
         // server-side VR Experience™ loop
     }
 
-    constructor() {
-        this.state = new Universe();
+    constructor(state: Universe) {
+        this.state = state;
         this.players = new PlayerStateHandler(this.state.players);
         this.emitters = new EmitterStateHandler(this.state.emitters);
         this.sounds = new SoundStateHandler(this.state.sounds);
