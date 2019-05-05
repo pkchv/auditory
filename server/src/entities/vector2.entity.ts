@@ -2,17 +2,15 @@ import { type, Schema } from '@colyseus/schema';
 
 export class Vector2 extends Schema {
 
-    static readonly origin: Vector2 = new Vector2({ x: 0, y: 0 });
+    @type('number')
+    public x: number = 0;
 
     @type('number')
-    public x: number;
-
-    @type('number')
-    public y: number;
+    public y: number = 0;
 
     constructor(partialPosition?: Partial<Vector2>) {
         super();
-        Object.assign(this, Vector2.origin, partialPosition);
+        Object.assign(this, partialPosition);
     }
 
 }

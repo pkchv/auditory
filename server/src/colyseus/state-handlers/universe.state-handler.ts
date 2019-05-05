@@ -10,7 +10,7 @@ export class UniverseStateHandler {
 
     private readonly logger: Logger = new Logger(UniverseStateHandler.name);
 
-    state: Universe;
+    private readonly state: Universe;
     players: PlayerStateHandler;
     emitters: EmitterStateHandler;
     sounds: SoundStateHandler;

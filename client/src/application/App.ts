@@ -25,26 +25,10 @@ export class App {
     }
 
     initialize(): void {
-        // create a basic BJS Scene object
-        this.scene = new Scene(this.engine);
-        this.initializeScene(this.scene)
-
-        this.camera = new UniversalCamera('camera', new Vector3(0, 5, -10), this.scene);
-
-        // attach the camera to the canvas
-        this.camera.attachControl(this.canvas, true);
-
-        // create a basic light, aiming 0,1,0 - meaning, to the sky
-        this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
-
-        // create a built-in "sphere" shape; with 16 segments and diameter of 2
-        let sphere = MeshBuilder.CreateSphere('sphere1', { segments: 16, diameter: 3}, this.scene);
-
-        // move the sphere upward 1/2 of its height
-        sphere.position.y = 2;
-
-        // create a built-in "ground" shape
-        MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 64}, this.scene);
+        this.initializeScene();
+        this.initializeCamera();
+        this.initializeControls();
+        this.initializeMockEntities();
     }
 
     resize(): void {
@@ -55,8 +39,37 @@ export class App {
         this.engine.runRenderLoop(() => this.scene.render());
     }
 
-    private initializeScene(scene: Scene) {
-        scene.audioEnabled = true;
+    close(): void {
+        this.scene.dispose();
+        this.network.getClientRef().close();
+    }
+
+    private initializeMockEntities() {
+        // create a basic light, aiming 0,1,0 - meaning, to the sky
+        new HemisphericLight('light0', new Vector3(0, 1, 0), this.scene);
+
+        // create a built-in "sphere" shape
+        MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter: 3}, this.scene);
+
+        // create a built-in "ground" shape
+        MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 128 }, this.scene);
+    }
+
+    private initializeScene() {
+        this.scene = new Scene(this.engine);
+        this.scene.audioEnabled = true;
+    }
+
+    private initializeCamera() {
+        // TODO: if WebVR change camera type
+        const initialPosition = new Vector3(0, 5, -10);
+        this.camera = new UniversalCamera('camera', initialPosition, this.scene);
+    }
+
+    private initializeControls() {
+        // TODO: detect control type
+        // attach default controls to the canvas
+        this.camera.attachControl(this.canvas, true);
     }
 
 }

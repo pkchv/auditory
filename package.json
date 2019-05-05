@@ -13,6 +13,7 @@
   "author": "Kamil Sieniawski <kamil.sieniawski@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.5",
     "sillyname": "^0.1.0"
   }
 }

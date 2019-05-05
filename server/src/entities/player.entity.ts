@@ -7,7 +7,7 @@ import { Model } from './model.entity';
 export class Player extends Schema {
 
     @type('number')
-    id: number;
+    id: number = 0;
 
     @type('string')
     uuid: string = generate();

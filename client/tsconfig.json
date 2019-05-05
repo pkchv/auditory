@@ -2,15 +2,18 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "outDir": "../build/public",
-    "lib": ["es2017", "dom"],
+    "lib": ["es6", "dom"],
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "removeComments": true
   },
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

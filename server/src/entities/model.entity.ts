@@ -7,7 +7,7 @@ import { Sound } from './sound.entity';
 export class Model extends Schema {
 
     @type('uint16')
-    id: number;
+    id: number = 0;
 
     @type(Material)
     material: Material = new Material();

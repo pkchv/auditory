@@ -11,16 +11,16 @@ export class Sound extends Schema {
     distanceModel: number = 0;
 
     @type(Vector3)
-    position?: Vector3;
+    position: Vector3 = new Vector3();
 
     @type('boolean')
-    spatialized: boolean;
+    spatialized: boolean = true;
 
     @type('boolean')
-    active: boolean;
+    active: boolean = true;
 
     @type('boolean')
-    loop: boolean;
+    loop: boolean = false;
 
     constructor(partialSound?: Partial<Sound>) {
         super();

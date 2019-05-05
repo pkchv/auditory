@@ -58,15 +58,25 @@ var config = {
     ].filter(Boolean)
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', 'json']
   },
   plugins: plugins,
   devServer: {
+    proxy: {
+      '/ws/': {
+        target: 'ws://localhost:8081',
+        secure: false,
+        ws: true,
+        disableHostCheck: true,
+      }
+    },
     contentBase: path.join(__dirname, '../build/public'),
     compress: true,
     port: 3000,
     host: "localhost",
-    hot: true
+    hot: true,
+    disableHostCheck: true,
+    allowedHosts: ['localhost']
   }
 };
 

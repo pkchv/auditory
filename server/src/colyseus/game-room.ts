@@ -1,29 +1,33 @@
 import { Logger } from '@nestjs/common';
-import { Client, Room } from 'colyseus';
+import { Client, Room, Presence, serialize, SchemaSerializer } from 'colyseus';
 
 import { UniverseStateHandler } from './state-handlers/universe.state-handler';
-import { Universe } from 'src/entities/universe.entity';
+import { Universe } from '../entities/universe.entity';
 
+@serialize(SchemaSerializer)
 export class GameRoom extends Room<Universe> {
 
     private readonly logger: Logger = new Logger(GameRoom.name);
 
     maxClients: number = 8;
-    state: Universe;
     handler: UniverseStateHandler;
 
     onInit(options) {
         if (options.maxClients !== undefined) {
             this.maxClients = options.maxClients;
         }
-
         this.setSimulationInterval(() => this.onUpdate());
         this.state = new Universe();
+        this.setState(new Universe());
         this.handler = new UniverseStateHandler(this.state);
-        this.setState(this.state);
     }
 
     requestJoin(options) {
+        this.logger.debug(options);
+        return true;
+    }
+
+    onAuth(options) {
         return true;
     }
 
@@ -32,6 +36,8 @@ export class GameRoom extends Room<Universe> {
     }
 
     onMessage(client: Client, data: any) {
+        // this.logger.debug(client);
+        this.logger.debug(data);
         const player = this.handler.players.read(client.id);
         const serialized = JSON.stringify(data);
         this.logger.debug(`[${client.id}] [${player.name}] ${serialized}`);
@@ -45,8 +51,6 @@ export class GameRoom extends Room<Universe> {
         this.handler.players.remove(client.id);
     }
 
-    onDispose() {
-        return null;
-    }
+    onDispose() {}
 
 }

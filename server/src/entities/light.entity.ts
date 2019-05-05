@@ -9,10 +9,10 @@ export class Light extends Schema {
     type: number = 0;
 
     @type(Vector3)
-    position: Vector3 = new Vector3({ x: 0, y: 0, z: 0 });
+    position: Vector3 = new Vector3();
 
     @type(Color)
-    color: Color = new Color({ r: 255, g: 255, b: 255});
+    color: Color = new Color();
 
     constructor(partialLight?: Partial<Light>) {
         super();

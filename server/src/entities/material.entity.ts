@@ -5,7 +5,7 @@ import { Color } from './color.entity';
 export class Material extends Schema {
 
     @type(Color)
-    color: Color = new Color({ r: 255, g: 255, b: 255 });
+    color: Color = new Color();
 
     @type('boolean')
     wireframe: boolean = false;

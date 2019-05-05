@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from 'nestjs-config';
 import * as path from 'path';
 
 import { ColyseusModule } from './colyseus/colyseus.module';
+import { ColyseusService } from './colyseus/colyseus.service';
 
 ConfigService.rootPath = path.resolve(__dirname, '.');
 

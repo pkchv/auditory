@@ -4,19 +4,20 @@ import { Emitter } from './emitter.entity';
 import { Light } from './light.entity';
 import { Player } from './player.entity';
 import { Sound } from './sound.entity';
+import { serialize, SchemaSerializer } from 'colyseus';
 
 export class Universe extends Schema {
 
     @type({ map: Player })
-    players = new MapSchema<Player>();
+    players: MapSchema<Player> = new MapSchema<Player>();
 
     @type({ map: Emitter })
-    emitters = new MapSchema<Emitter>();
+    emitters: MapSchema<Emitter> = new MapSchema<Emitter>();
 
     @type({ map: Sound })
-    sounds = new MapSchema<Sound>();
+    sounds: MapSchema<Sound> = new MapSchema<Sound>();
 
     @type({ map: Light })
-    lights = new MapSchema<Light>();
+    lights: MapSchema<Light> = new MapSchema<Light>();
 
 }

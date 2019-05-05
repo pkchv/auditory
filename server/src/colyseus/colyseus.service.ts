@@ -1,14 +1,15 @@
-import { Injectable, Logger, OnApplicationShutdown, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Server } from 'colyseus';
 import { RoomConstructor } from 'colyseus/lib/Room';
 import * as http from 'http';
-import { generate as generateRoomId } from 'namor';
 import { ConfigService, InjectConfig } from 'nestjs-config';
 
 import { GameRoom } from './game-room';
+import express = require('express');
+import cors = require('cors');
 
 @Injectable()
-export class ColyseusService implements OnModuleInit, OnModuleDestroy, OnApplicationShutdown {
+export class ColyseusService {
 
   private readonly logger = new Logger(ColyseusService.name);
 
@@ -19,11 +20,10 @@ export class ColyseusService implements OnModuleInit, OnModuleDestroy, OnApplica
   constructor(
     @InjectConfig() private readonly config: ConfigService,
   ) {
-    this.internalServerRef = http.createServer();
+    const app = express();
+    app.use(cors());
+    this.internalServerRef = http.createServer(app);
     this.server = new Server({ server: this.internalServerRef });
-  }
-
-  onModuleInit() {
     const port = this.config.get('game-server.port', 8081);
     const id = this.config.get('room.name', 'default');
     this.registerDefaultRoom(id);
@@ -31,24 +31,16 @@ export class ColyseusService implements OnModuleInit, OnModuleDestroy, OnApplica
     this.server.listen(port);
   }
 
-  register(id: string, handler: RoomConstructor<any>, options?: any) {
+  async register(id: string, handler: RoomConstructor<any>, options?: any) {
     this.logger.log(`Registering game room with id: '${id}'`);
     this.logger.debug(`Room settings:`);
     this.logger.debug(options);
-    return this.server.register(id, handler, options);
+    await this.server.register(id, handler, options);
   }
 
   private registerDefaultRoom(id) {
     const options = Object.assign({ id }, this.config.get('room'));
     this.register(id, GameRoom, options);
-  }
-
-  async onModuleDestroy() {
-    return this.server.gracefullyShutdown();
-  }
-
-  async onApplicationShutdown() {
-    return this.server.gracefullyShutdown();
   }
 
 }
