@@ -4,7 +4,6 @@ import { Emitter } from './emitter.entity';
 import { Light } from './light.entity';
 import { Player } from './player.entity';
 import { Sound } from './sound.entity';
-import { serialize, SchemaSerializer } from 'colyseus';
 
 export class Universe extends Schema {
 
