@@ -1,9 +1,10 @@
 import { Engine, HemisphericLight, Light, MeshBuilder, Scene, UniversalCamera, Vector3 } from 'babylonjs';
 
 import { Assets } from './Assets';
-import { IConfig } from './Config';
-import {IFeatures } from './Features';
+import { IConfig, IConfigScene } from './Config';
+import { IFeatures } from './Features';
 import { Network } from './Network';
+import { toVector3 } from './utility/to-vector3';
 
 export class App {
     private config: IConfig;
@@ -49,21 +50,29 @@ export class App {
         new HemisphericLight('light0', new Vector3(0, 1, 0), this.scene);
 
         // create a built-in "sphere" shape
-        MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter: 3}, this.scene);
+        const sphere = MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter: 3}, this.scene);
+        sphere.checkCollisions = true;
 
         // create a built-in "ground" shape
-        MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 128 }, this.scene);
+        const ground = MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 128 }, this.scene);
+        ground.position.y -= 4;
+        ground.checkCollisions = true;
     }
 
     private initializeScene() {
         this.scene = new Scene(this.engine);
-        this.scene.audioEnabled = true;
+        const { audioEnabled, gravity, collisionsEnabled } = this.config.scene;
+        this.scene.audioEnabled = audioEnabled;
+        this.scene.gravity = toVector3(gravity);
+        this.scene.collisionsEnabled = collisionsEnabled;
     }
 
     private initializeCamera() {
         // TODO: if WebVR change camera type
-        const initialPosition = new Vector3(0, 5, -10);
-        this.camera = new UniversalCamera('camera', initialPosition, this.scene);
+        const { initialPosition, applyGravity, checkCollisions } = this.config.camera;
+        this.camera = new UniversalCamera('camera0', toVector3(initialPosition), this.scene);
+        this.camera.applyGravity = applyGravity;
+        this.camera.checkCollisions = checkCollisions;
     }
 
     private initializeControls() {
