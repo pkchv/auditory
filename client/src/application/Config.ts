@@ -17,13 +17,22 @@ interface IConfigCamera {
     initialPosition: Vector3Dto;
     applyGravity: boolean;
     ellipsoid: Vector3Dto;
+    ellipsoidOffset: Vector3Dto;
     checkCollisions: boolean;
+    speed: number;
+    angularSensibility: number;
+    gamepadAngularSensibility: number;
+}
+
+interface IConfigSandbox {
+    size: number;
 }
 
 interface IConfig {
     server: IConfigServer;
     scene: IConfigScene;
     camera: IConfigCamera;
+    sandbox: IConfigSandbox;
 }
 
 const config: IConfig = {
@@ -39,10 +48,17 @@ const config: IConfig = {
         collisionsEnabled: true,
     },
     camera: {
-        initialPosition: { x: 0, y: 0, z: -8 },
+        initialPosition: { x: 20, y: 3, z: 20 },
         applyGravity: true,
         ellipsoid: { x: 1, y: 1, z: 1 },
-        checkCollisions: true
+        ellipsoidOffset: { x: 0, y: -50, z: 0 },
+        checkCollisions: true,
+        speed: 3,
+        angularSensibility: 2700,
+        gamepadAngularSensibility: 2500,
+    },
+    sandbox: {
+        size: 2048,
     }
 };
 

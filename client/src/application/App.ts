@@ -1,35 +1,40 @@
-import { Engine, HemisphericLight, Light, MeshBuilder, Scene, UniversalCamera, Vector3 } from 'babylonjs';
+import { Engine, MeshBuilder, Scene, UniversalCamera } from 'babylonjs';
 
-import { Assets } from './Assets';
-import { IConfig, IConfigScene } from './Config';
+import { IConfig } from './Config';
 import { IFeatures } from './Features';
 import { Network } from './Network';
+import { Sandbox } from './Sandbox';
+import { createGridMaterial } from './utility/create-grid-material';
 import { toVector3 } from './utility/to-vector3';
 
 export class App {
-    private config: IConfig;
-    private features: IFeatures;
-    private canvas: HTMLCanvasElement;
-    private engine: Engine;
-    private scene: Scene;
-    private camera: UniversalCamera;
-    private network: Network;
-    private light: Light;
-    private assets: Assets;
+    private readonly canvas: HTMLCanvasElement;
+    private readonly engine: Engine;
+    private readonly scene: Scene;
+    private readonly network: Network;
 
-    constructor(element: string, config: IConfig, features: IFeatures) {
+    private camera: UniversalCamera;
+    private sandbox: Sandbox;
+
+    constructor(
+        element: string,
+        private readonly config: IConfig,
+        private readonly features: IFeatures
+    ) {
         this.canvas = <HTMLCanvasElement> document.getElementById(element);
         this.engine = new Engine(this.canvas, true);
+        this.scene = new Scene(this.engine);
         this.network = new Network(config.server);
         this.config = config;
         this.features = features;
     }
 
     initialize(): void {
-        this.initializeScene();
-        this.initializeCamera();
-        this.initializeControls();
-        this.initializeMockEntities();
+        this.initScene();
+        this.initSandbox();
+        this.initCamera();
+        this.initControls();
+        this.addMockEntities();
     }
 
     resize(): void {
@@ -45,37 +50,43 @@ export class App {
         this.network.getClientRef().close();
     }
 
-    private initializeMockEntities() {
-        // create a basic light, aiming 0,1,0 - meaning, to the sky
-        new HemisphericLight('light0', new Vector3(0, 1, 0), this.scene);
-
-        // create a built-in "sphere" shape
-        const sphere = MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter: 3}, this.scene);
+    private addMockEntities() {
+        const diameter = 20;
+        const shift = 20;
+        const sphere = MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter }, this.scene);
         sphere.checkCollisions = true;
-
-        // create a built-in "ground" shape
-        const ground = MeshBuilder.CreateGround('ground1', {width: 1024, height: 1024, subdivisions: 128 }, this.scene);
-        ground.position.y -= 4;
-        ground.checkCollisions = true;
+        sphere.position.y = -(this.sandbox.size / 2) + diameter + shift;
+        sphere.material = createGridMaterial(this.scene);
     }
 
-    private initializeScene() {
-        this.scene = new Scene(this.engine);
+    private initScene() {
         const { audioEnabled, gravity, collisionsEnabled } = this.config.scene;
         this.scene.audioEnabled = audioEnabled;
         this.scene.gravity = toVector3(gravity);
         this.scene.collisionsEnabled = collisionsEnabled;
     }
 
-    private initializeCamera() {
+    private initSandbox() {
+        const { size } = this.config.sandbox;
+        this.sandbox = new Sandbox(size, this.scene);
+        this.sandbox.initializeSandbox();
+    }
+
+    private initCamera() {
         // TODO: if WebVR change camera type
-        const { initialPosition, applyGravity, checkCollisions } = this.config.camera;
+        const { initialPosition, applyGravity, checkCollisions, ellipsoid,
+                ellipsoidOffset, speed, angularSensibility, gamepadAngularSensibility } = this.config.camera;
         this.camera = new UniversalCamera('camera0', toVector3(initialPosition), this.scene);
         this.camera.applyGravity = applyGravity;
         this.camera.checkCollisions = checkCollisions;
+        this.camera.ellipsoid = toVector3(ellipsoid);
+        this.camera.ellipsoidOffset = toVector3(ellipsoidOffset)
+        this.camera.speed = speed;
+        this.camera.angularSensibility = angularSensibility;
+        this.camera.gamepadAngularSensibility = gamepadAngularSensibility;
     }
 
-    private initializeControls() {
+    private initControls() {
         // TODO: detect control type
         // attach default controls to the canvas
         this.camera.attachControl(this.canvas, true);

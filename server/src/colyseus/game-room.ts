@@ -17,9 +17,9 @@ export class GameRoom extends Room<Universe> {
             this.maxClients = options.maxClients;
         }
         this.setSimulationInterval(() => this.onUpdate());
-        this.state = new Universe();
-        this.setState(new Universe());
-        this.handler = new UniverseStateHandler(this.state);
+        const universe = new Universe();
+        this.setState(universe);
+        this.handler = new UniverseStateHandler(universe);
     }
 
     requestJoin(options) {

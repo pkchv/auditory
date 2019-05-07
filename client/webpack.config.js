@@ -62,21 +62,18 @@ var config = {
   },
   plugins: plugins,
   devServer: {
-    proxy: {
-      '/ws/': {
-        target: 'ws://localhost:8081',
-        secure: false,
-        ws: true,
-        disableHostCheck: true,
-      }
-    },
     contentBase: path.join(__dirname, '../build/public'),
     compress: true,
     port: 3000,
-    host: "localhost",
+    host: '0.0.0.0',
     hot: true,
     disableHostCheck: true,
-    allowedHosts: ['localhost']
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        pathRewrite: {'^/api' : ''}
+      }
+    },
   }
 };
 
