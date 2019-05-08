@@ -41,14 +41,18 @@ export class Network {
         });
     }
 
-    public joinRoom() {
+    connect() {
         this.room = this.client.join(this.config.room)
     }
 
+    send(payload: object) {
+        this.room.onStateChange.addOnce(() => {
+            this.room.send(payload);
+        });
+    }
+
     attachRoomListener<T>(type: ListenerType, entity: EntityType, callback: ListenerCallback<T>) {
-       this.room.onStateChange.addOnce(() => {
         this.room.state[entity][type] = callback;
-      });
     }
 
     getClientRef(): Colyseus.Client {

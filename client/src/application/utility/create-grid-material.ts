@@ -4,6 +4,9 @@ import { GridMaterial } from 'babylonjs-materials';
 
 const random = require('random');
 
+function randomColor() {
+    return new Color3(random.float(), random.float(), random.float());
+}
 interface IGridMaterialDef {
     majorUnitFrequency: number;
     minorUnitVisibility: number;
@@ -14,11 +17,11 @@ interface IGridMaterialDef {
 }
 
 const defaults: IGridMaterialDef = {
-    majorUnitFrequency: random.integer(0, 8),
-    minorUnitVisibility: random.float(0, 1),
-    gridRatio: random.integer(0, 4),
-    mainColor: new Color3(random.float(), random.float(), random.float()),
-    lineColor: new Color3(random.float(), random.float(), random.float()),
+    majorUnitFrequency: random.integer(1, 4),
+    minorUnitVisibility: random.float(0.5, 1),
+    gridRatio: random.integer(1, 16),
+    mainColor: randomColor(),
+    lineColor: randomColor(),
     opacity: 1
 };
 
