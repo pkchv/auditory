@@ -30,9 +30,9 @@ export class App {
     }
 
     initialize(): void {
-        this.initWebVR();
         this.initScene();
         this.initSandbox();
+        this.initWebVR();
     }
 
     resize(): void {
@@ -40,7 +40,7 @@ export class App {
     }
 
     run(): void {
-        this.engine.runRenderLoop(() => this.scene.render());
+        this.engine.runRenderLoop(() => this.scene.render(true));
     }
 
     close(): void {
@@ -53,21 +53,36 @@ export class App {
         const shift = 20;
         const sphere = MeshBuilder.CreateSphere('sphere0', { segments: 16, diameter }, this.scene);
         sphere.checkCollisions = true;
-        sphere.position.y = -(this.sandbox.size / 2) + diameter + shift;
+        sphere.position.y = -(this.config.sandbox.size / 2) + diameter + shift;
         sphere.position.z += 100;
         sphere.material = createGridMaterial(this.scene);
         sphere['interactive'] = true;
     }
 
     private initWebVR() {
-        this.vr = this.scene.createDefaultVRExperience();
+
+        this.vr = this.scene.createDefaultVRExperience({
+            rayLength: this.config.sandbox.rayLength,
+        });
+
         this.vr.enableInteractions();
         this.vr.raySelectionPredicate = () => true
         this.vr.meshSelectionPredicate = (mesh) => mesh['interactive'] || false
         this.vr.changeLaserColor(new Color3(85.0, 0, 0));
         this.vr.onNewMeshSelected.add((mesh) => {
-            console.log(mesh.name);
+            if (mesh['isPlatform'] !== true) {
+                console.log(mesh.name);
+            }
         });
+
+        this.vr.onNewMeshPicked.add((pickingInfo) => {
+            if (pickingInfo.pickedMesh['isPlatform'] === true) {
+                const { x, z } = pickingInfo.pickedPoint;
+                this.scene.activeCamera.position.x = x;
+                this.scene.activeCamera.position.z = z;
+            }
+        });
+
         this.configureCameras();
     }
 
@@ -79,9 +94,8 @@ export class App {
     }
 
     private initSandbox() {
-        const { size } = this.config.sandbox;
-        this.sandbox = new Sandbox(size, this.scene);
-        this.sandbox.initializeSandbox();
+        this.sandbox = new Sandbox(this.config.sandbox, this.scene);
+        this.sandbox.createSandbox();
     }
 
     private configureCameras() {
@@ -99,25 +113,29 @@ export class App {
         camera.applyGravity = applyGravity;
         camera.checkCollisions = checkCollisions;
         camera.ellipsoid = toVector3(ellipsoid);
-        camera.ellipsoidOffset = toVector3(ellipsoidOffset)
-        camera.speed = speed;
-        camera.angularSensibility = angularSensibility;
-        camera.attachControl(this.canvas, true);
+        camera.ellipsoidOffset = toVector3(ellipsoidOffset);
+        camera.inputs.clear()
+        camera.detachControl(this.canvas);
     }
 
     private configureVRCamera() {
         const { applyGravity, checkCollisions, ellipsoid,
-            ellipsoidOffset, speed } = this.config.camera;
-        const size = -this.config.sandbox.size / 2 + 20;
+            ellipsoidOffset, speed, angularSensibility } = this.config.camera;
+        const size = -this.config.sandbox.size / 2 + 50;
         const initialPosition = new Vector3(0, size, 0);
         const camera = this.vr.webVRCamera;
         camera.position = initialPosition;
         camera.applyGravity = applyGravity;
         camera.checkCollisions = checkCollisions;
         camera.ellipsoid = toVector3(ellipsoid);
-        camera.ellipsoidOffset = toVector3(ellipsoidOffset)
+        camera.ellipsoidOffset = toVector3(ellipsoidOffset);
         camera.speed = speed;
-        camera.attachControl(this.canvas, true);
+        camera.angularSensibility = angularSensibility;
+        camera.onControllersAttachedObservable.addOnce((controller) => {
+            console.log(controller);
+        });
+        camera.inputs.addGamepad();
+        camera.attachControl(this.canvas);
     }
 
 }

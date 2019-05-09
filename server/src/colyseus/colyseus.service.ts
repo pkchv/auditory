@@ -26,9 +26,11 @@ export class ColyseusService {
     this.server = new Server({ server: this.internalServerRef });
     const port = this.config.get('game-server.port', 8081);
     const id = this.config.get('room.name', 'default');
+    const dev = this.config.get('game-server.dev', false);
+    const hostname = dev ? '0.0.0.0' : '127.0.0.1';
     this.registerDefaultRoom(id);
     this.logger.log(`Game server listens on port ${port}`);
-    this.server.listen(port);
+    this.server.listen(port, hostname);
   }
 
   async register(id: string, handler: RoomConstructor<any>, options?: any) {

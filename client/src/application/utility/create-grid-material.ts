@@ -29,6 +29,6 @@ export function createGridMaterial(
         scene: Scene,
         def: Partial<IGridMaterialDef> = defaults,
         id: string = uuid()
-    ) {
+    ): GridMaterial {
     return Object.assign(new GridMaterial(id, scene), def);
 }

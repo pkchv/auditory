@@ -16,7 +16,7 @@ export class Network {
     get url() {
         return createUrl(
             this.config.protocol,
-            this.config.address,
+            this.config.dev ? window.location.hostname : this.config.hostname,
             this.config.port
         )
     }

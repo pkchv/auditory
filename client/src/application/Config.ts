@@ -1,8 +1,9 @@
 import { Vector3Dto } from './dto/vector3.dto';
 
 interface IConfigServer {
+    dev: boolean;
     protocol: string;
-    address: string;
+    hostname: string;
     room: string;
     port: number;
 }
@@ -26,6 +27,14 @@ interface IConfigCamera {
 
 interface IConfigSandbox {
     size: number;
+    rayLength: number;
+    createPlatforms: boolean;
+    platforms: {
+        frequency: number;
+        sizeReduction: number;
+        modX: number;
+        modZ: number;
+    }
 }
 
 interface IConfig {
@@ -37,8 +46,9 @@ interface IConfig {
 
 const config: IConfig = {
     server: {
+        dev: true,
         protocol: 'ws',
-        address: 'localhost',
+        hostname: 'localhost',
         room: 'vr-auditory',
         port: 8081
     },
@@ -51,15 +61,23 @@ const config: IConfig = {
         initialPosition: { x: 20, y: 3, z: 20 },
         applyGravity: true,
         ellipsoid: { x: 1, y: 1, z: 1 },
-        ellipsoidOffset: { x: 0, y: -50, z: 0 },
+        ellipsoidOffset: { x: 0, y: 10, z: 0 },
         checkCollisions: true,
         speed: 3,
-        angularSensibility: 2700,
+        angularSensibility: 8000,
         gamepadAngularSensibility: 2500,
     },
     sandbox: {
         size: 2048,
+        rayLength: 20000,
+        createPlatforms: true,
+        platforms: {
+            frequency: 16,
+            sizeReduction: 2,
+            modX: 4,
+            modZ: 5,
+        }
     }
 };
 
-export { config, IConfig, IConfigServer, IConfigScene };
+export { config, IConfig, IConfigServer, IConfigScene, IConfigCamera, IConfigSandbox };
