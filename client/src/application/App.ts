@@ -1,16 +1,28 @@
-import { Color3, Engine, MeshBuilder, Scene, Vector3, VRExperienceHelper } from 'babylonjs';
+import { AbstractMesh, Color3, Engine, MeshBuilder, Scene, Vector3, VRExperienceHelper } from 'babylonjs';
 
-import { IConfig } from './Config';
+import { Assets } from './Assets';
+import { AudioEngine } from './AudioEngine';
+import { Vector3Dto } from './dto/vector3.dto';
+import { EventEngine } from './EventEngine';
+import { Input } from './Input';
+import { IConfig } from './interfaces/IConfig';
 import { Network } from './Network';
 import { Sandbox } from './Sandbox';
 import { createGridMaterial } from './utility/create-grid-material';
+import { getId } from './utility/get-mesh-id';
 import { toVector3 } from './utility/to-vector3';
+import { fromVector3 } from './utility/from-vector3';
+import { PlaybackDto } from './dto/playback.dto';
 
 export class App {
 
     private readonly engine: Engine;
     private readonly scene: Scene;
     private readonly network: Network;
+    private readonly assets: Assets;
+    private readonly audio: AudioEngine;
+    private readonly event: EventEngine;
+    private readonly input: Input;
 
     private sandbox: Sandbox;
     private vr: VRExperienceHelper;
@@ -26,13 +38,22 @@ export class App {
         this.engine = new Engine(this.canvas, true);
         this.scene = new Scene(this.engine);
         this.network = new Network(config.server);
-        this.network.connect();
+        this.assets = new Assets(this.scene, this.config.assets);
+        this.audio = new AudioEngine(this.assets.sounds);
+        this.event = new EventEngine(this.network);
+        this.input = new Input();
     }
 
     initialize(): void {
+        this.network.connect();
         this.initScene();
         this.initSandbox();
         this.initWebVR();
+    }
+
+    async loadAssets() {
+        await this.assets.fetch();
+        this.assets.load();
     }
 
     resize(): void {
@@ -40,7 +61,9 @@ export class App {
     }
 
     run(): void {
-        this.engine.runRenderLoop(() => this.scene.render(true));
+        this.assets.setOnFinish(() => {
+            this.engine.runRenderLoop(() => this.scene.render(true))
+        })
     }
 
     close(): void {
@@ -69,17 +92,23 @@ export class App {
         this.vr.raySelectionPredicate = () => true
         this.vr.meshSelectionPredicate = (mesh) => mesh['interactive'] || false
         this.vr.changeLaserColor(new Color3(85.0, 0, 0));
-        this.vr.onNewMeshSelected.add((mesh) => {
-            if (mesh['isPlatform'] !== true) {
-                console.log(mesh.name);
+        this.vr.onNewMeshSelected.add((mesh: AbstractMesh) => {
+            if (mesh['isPlatform'] !== true && mesh.name !== this.sandbox.floor.name) {
+                this.event.action(getId(mesh), mesh.position);
+                this.audio.play(new PlaybackDto({
+                    id: 1,
+                    position: fromVector3(mesh.position),
+                }));
             }
         });
 
         this.vr.onNewMeshPicked.add((pickingInfo) => {
             if (pickingInfo.pickedMesh['isPlatform'] === true) {
-                const { x, z } = pickingInfo.pickedPoint;
-                this.scene.activeCamera.position.x = x;
-                this.scene.activeCamera.position.z = z;
+                const { x, z } = pickingInfo.pickedPoint;;
+                const y = this.scene.activeCamera.position.y;
+                const position = new Vector3Dto({ x, y, z })
+                this.event.movement(position);
+                this.input.move(this.scene.activeCamera, position);
             }
         });
 

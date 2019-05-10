@@ -9,7 +9,9 @@ const app = new App(elementId, config);
 window.addEventListener('DOMContentLoaded', () => {
     app.initialize();
     app.addMockEntities();
-    app.run();
+    app.loadAssets().then(() => {
+        app.run();
+    })
 });
 
 window.addEventListener('resize', () => app.resize());

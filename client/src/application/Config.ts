@@ -1,48 +1,4 @@
-import { Vector3Dto } from './dto/vector3.dto';
-
-interface IConfigServer {
-    dev: boolean;
-    protocol: string;
-    hostname: string;
-    room: string;
-    port: number;
-}
-
-interface IConfigScene {
-    audioEnabled: boolean;
-    gravity: Vector3Dto;
-    collisionsEnabled: boolean;
-}
-
-interface IConfigCamera {
-    initialPosition: Vector3Dto;
-    applyGravity: boolean;
-    ellipsoid: Vector3Dto;
-    ellipsoidOffset: Vector3Dto;
-    checkCollisions: boolean;
-    speed: number;
-    angularSensibility: number;
-    gamepadAngularSensibility: number;
-}
-
-interface IConfigSandbox {
-    size: number;
-    rayLength: number;
-    createPlatforms: boolean;
-    platforms: {
-        frequency: number;
-        sizeReduction: number;
-        modX: number;
-        modZ: number;
-    }
-}
-
-interface IConfig {
-    server: IConfigServer;
-    scene: IConfigScene;
-    camera: IConfigCamera;
-    sandbox: IConfigSandbox;
-}
+import { IConfig } from './interfaces/IConfig';
 
 const config: IConfig = {
     server: {
@@ -77,7 +33,15 @@ const config: IConfig = {
             modX: 4,
             modZ: 5,
         }
+    },
+    assets: {
+        dev: true,
+        protocol: 'http',
+        hostname: 'localhost',
+        port: 3000,
+        dataStore: '/api/asset-store',
+        api: '/api/assets'
     }
 };
 
-export { config, IConfig, IConfigServer, IConfigScene, IConfigCamera, IConfigSandbox };
+export { config };

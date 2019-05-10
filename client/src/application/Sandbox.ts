@@ -4,12 +4,12 @@ import { Color3, Color4, HemisphericLight, Mesh, MeshBuilder, Scene, Vector3, St
 
 import { createGridMaterial } from './utility/create-grid-material';
 import { GridMaterial } from 'babylonjs-materials';
-import { IConfigSandbox } from './Config';
+import { IConfigSandbox } from './interfaces/IConfigSandbox';
 
 export class Sandbox {
 
     public light: HemisphericLight;
-    public ground: Mesh;
+    public floor: Mesh;
     public walls: Mesh[];
     public platforms: Mesh[];
 
@@ -26,7 +26,7 @@ export class Sandbox {
     createSandbox() {
         this.configureScene();
         this.light = this.createLight();
-        this.ground = this.createFloor();
+        this.floor = this.createFloor();
         this.walls = this.createWalls();
 
         if (this.config.createPlatforms) {
@@ -96,7 +96,13 @@ export class Sandbox {
                     platform.position.z += -(size / 2) + z * (size / frequency) + sizeReduction;
                     platform.checkCollisions = true;
                     platform.receiveShadows = true;
-                    platform.material = this.createFloorMaterial(new Color3(0.1, 0, 0.8));
+                    platform.material = createGridMaterial(this.scene, {
+                        majorUnitFrequency: 2,
+                        minorUnitVisibility: 1 / 8,
+                        gridRatio: 2,
+                        mainColor: new Color3(0.1, 0.8, 0.9),
+                        lineColor: new Color3(1, 1, 1),
+                    })
                     platform['interactive'] = true;
                     platform['isPlatform'] = true;
                     platforms.push(platform);

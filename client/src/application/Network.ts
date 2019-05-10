@@ -1,6 +1,6 @@
 import * as Colyseus from 'colyseus.js';
 
-import { IConfigServer } from './Config';
+import { IConfigServer } from './interfaces/IConfigServer';
 import { createUrl } from './utility/create-url';
 
 type EntityType = "players" | "emitters" | "sounds" | "lights"
@@ -14,10 +14,11 @@ export class Network {
     private room: Colyseus.Room;
 
     get url() {
+        const { dev, protocol, hostname, port } = this.config;
         return createUrl(
-            this.config.protocol,
-            this.config.dev ? window.location.hostname : this.config.hostname,
-            this.config.port
+            protocol,
+            dev ? window.location.hostname : hostname,
+            port
         )
     }
 
@@ -46,9 +47,7 @@ export class Network {
     }
 
     send(payload: object) {
-        this.room.onStateChange.addOnce(() => {
-            this.room.send(payload);
-        });
+        this.room.send(payload);
     }
 
     attachRoomListener<T>(type: ListenerType, entity: EntityType, callback: ListenerCallback<T>) {
