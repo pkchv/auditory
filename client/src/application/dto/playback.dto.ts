@@ -8,7 +8,7 @@ export class PlaybackDto {
     maxDistance: number = 100;
     position: Vector3Dto = { x: 0, y: 0, z: 0 };
     spatialSound: boolean = true;
-    loop: boolean = true;
+    loop: boolean = false;
 
     constructor(partial?: Partial<PlaybackDto>) {
         Object.assign(this, partial);

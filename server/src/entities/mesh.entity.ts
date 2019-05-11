@@ -7,6 +7,9 @@ export class Mesh extends Schema {
     @type('uint16')
     id: number = 0;
 
+    @type('boolean')
+    abstract: boolean = true;
+
     @type(Vector3)
     position: Vector3 = new Vector3();
 

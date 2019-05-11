@@ -3,7 +3,7 @@ import { IConfig } from './interfaces/IConfig';
 const config: IConfig = {
     server: {
         dev: true,
-        protocol: 'ws',
+        protocol: 'wss',
         hostname: 'localhost',
         room: 'vr-auditory',
         port: 8081
@@ -14,7 +14,7 @@ const config: IConfig = {
         collisionsEnabled: true,
     },
     camera: {
-        initialPosition: { x: 20, y: 3, z: 20 },
+        initialPosition: { x: 200, y: 10, z: 120 },
         applyGravity: true,
         ellipsoid: { x: 1, y: 1, z: 1 },
         ellipsoidOffset: { x: 0, y: 10, z: 0 },
@@ -36,7 +36,7 @@ const config: IConfig = {
     },
     assets: {
         dev: true,
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'localhost',
         port: 3000,
         dataStore: '/api/asset-store',

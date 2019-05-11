@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     app.addMockEntities();
     app.loadAssets().then(() => {
         app.run();
-    })
+    });
 });
 
 window.addEventListener('resize', () => app.resize());

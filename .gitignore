@@ -1,2 +1,4 @@
 node_modules/
 /build/*
+cert/*
+!cert/generate.sh

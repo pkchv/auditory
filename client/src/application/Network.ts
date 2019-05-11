@@ -30,6 +30,7 @@ export class Network {
 
     private attachClientListeners() {
         this.client.onClose.add(() => {
+            this.room = this.client.join(this.config.room);
             console.error('connection closed.')
         });
 
@@ -38,6 +39,7 @@ export class Network {
         });
 
         this.client.onError.add((error: any) => {
+            this.room = this.client.join(this.config.room);
             console.error(error)
         });
     }
@@ -47,7 +49,13 @@ export class Network {
     }
 
     send(payload: object) {
-        this.room.send(payload);
+        if (this.room.hasJoined) {
+            return this.room.send(payload);
+        }
+
+        this.room.onJoin.addOnce(() => {
+            this.room.send(payload);
+        });
     }
 
     attachRoomListener<T>(type: ListenerType, entity: EntityType, callback: ListenerCallback<T>) {

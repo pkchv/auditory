@@ -16,11 +16,11 @@ export class Sound extends Schema {
     @type('boolean')
     spatialized: boolean = true;
 
-    @type('boolean')
-    active: boolean = true;
+    @type('int32')
+    maxDistance: number = 100;
 
-    @type('boolean')
-    loop: boolean = false;
+    @type('float64')
+    playbackRate: number = 1;
 
     constructor(partialSound?: Partial<Sound>) {
         super();

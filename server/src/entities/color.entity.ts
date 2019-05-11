@@ -2,14 +2,14 @@ import { type, Schema } from '@colyseus/schema';
 
 export class Color extends Schema {
 
-    @type('uint8')
-    public r: number = 255;
+    @type('float64')
+    public r: number = 1;
 
-    @type('uint8')
-    public g: number = 255;
+    @type('float64')
+    public g: number = 1;
 
-    @type('uint8')
-    public b: number = 255;
+    @type('float64')
+    public b: number = 1;
 
     constructor(partialPosition?: Partial<Color>) {
         super();

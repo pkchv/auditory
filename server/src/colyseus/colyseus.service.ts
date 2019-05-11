@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Server } from 'colyseus';
 import { RoomConstructor } from 'colyseus/lib/Room';
-import * as http from 'http';
+import * as https from 'https';
 import { ConfigService, InjectConfig } from 'nestjs-config';
 
 import { GameRoom } from './game-room';
+import { httpsOptions } from '../config/https-options';
 import express = require('express');
 import cors = require('cors');
 
@@ -13,7 +14,7 @@ export class ColyseusService {
 
   private readonly logger = new Logger(ColyseusService.name);
 
-  private readonly internalServerRef: http.Server;
+  private readonly internalServerRef: https.Server;
 
   private readonly server: Server;
 
@@ -22,7 +23,7 @@ export class ColyseusService {
   ) {
     const app = express();
     app.use(cors());
-    this.internalServerRef = http.createServer(app);
+    this.internalServerRef = https.createServer(httpsOptions, app);
     this.server = new Server({ server: this.internalServerRef });
     const port = this.config.get('game-server.port', 8081);
     const id = this.config.get('room.name', 'default');

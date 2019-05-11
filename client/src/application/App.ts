@@ -13,6 +13,7 @@ import { getId } from './utility/get-mesh-id';
 import { toVector3 } from './utility/to-vector3';
 import { fromVector3 } from './utility/from-vector3';
 import { PlaybackDto } from './dto/playback.dto';
+import { Action } from '../../../server/src/colyseus/dto/action.message';
 
 export class App {
 
@@ -49,6 +50,7 @@ export class App {
         this.initScene();
         this.initSandbox();
         this.initWebVR();
+        this.initStateHandlers();
     }
 
     async loadAssets() {
@@ -63,7 +65,7 @@ export class App {
     run(): void {
         this.assets.setOnFinish(() => {
             this.engine.runRenderLoop(() => this.scene.render(true))
-        })
+        });
     }
 
     close(): void {
@@ -78,6 +80,7 @@ export class App {
         sphere.checkCollisions = true;
         sphere.position.y = -(this.config.sandbox.size / 2) + diameter + shift;
         sphere.position.z += 100;
+        sphere.position.x += 1000;
         sphere.material = createGridMaterial(this.scene);
         sphere['interactive'] = true;
     }
@@ -92,6 +95,7 @@ export class App {
         this.vr.raySelectionPredicate = () => true
         this.vr.meshSelectionPredicate = (mesh) => mesh['interactive'] || false
         this.vr.changeLaserColor(new Color3(85.0, 0, 0));
+
         this.vr.onNewMeshSelected.add((mesh: AbstractMesh) => {
             if (mesh['isPlatform'] !== true && mesh.name !== this.sandbox.floor.name) {
                 this.event.action(getId(mesh), mesh.position);
@@ -104,11 +108,11 @@ export class App {
 
         this.vr.onNewMeshPicked.add((pickingInfo) => {
             if (pickingInfo.pickedMesh['isPlatform'] === true) {
-                const { x, z } = pickingInfo.pickedPoint;;
+                const { x, z } = pickingInfo.pickedPoint;
                 const y = this.scene.activeCamera.position.y;
                 const position = new Vector3Dto({ x, y, z })
-                this.event.movement(position);
                 this.input.move(this.scene.activeCamera, position);
+                this.event.movement(position);
             }
         });
 
@@ -143,6 +147,8 @@ export class App {
         camera.checkCollisions = checkCollisions;
         camera.ellipsoid = toVector3(ellipsoid);
         camera.ellipsoidOffset = toVector3(ellipsoidOffset);
+        camera.speed = speed;
+        camera.angularSensibility = angularSensibility;
         camera.inputs.clear()
         camera.detachControl(this.canvas);
     }
@@ -160,11 +166,17 @@ export class App {
         camera.ellipsoidOffset = toVector3(ellipsoidOffset);
         camera.speed = speed;
         camera.angularSensibility = angularSensibility;
-        camera.onControllersAttachedObservable.addOnce((controller) => {
-            console.log(controller);
-        });
         camera.inputs.addGamepad();
         camera.attachControl(this.canvas);
+    }
+
+    private initStateHandlers() {
+        this.network.onMessage(({ data: { meshId, position }}: Action) => {
+            this.audio.play(new PlaybackDto({
+                id: 2,
+                position: toVector3(position),
+            }));
+        })
     }
 
 }

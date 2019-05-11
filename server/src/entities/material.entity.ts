@@ -4,17 +4,23 @@ import { Color } from './color.entity';
 
 export class Material extends Schema {
 
-    @type(Color)
-    color: Color = new Color();
-
-    @type('boolean')
-    wireframe: boolean = false;
-
-    @type('uint16')
-    texture: number = 0;
+    @type('float64')
+    majorUnitFrequency: number;
 
     @type('float64')
-    alpha: number = 1.0;
+    minorUnitVisibility: number;
+
+    @type('float64')
+    gridRatio: number;
+
+    @type(Color)
+    mainColor: Color;
+
+    @type(Color)
+    lineColor: Color;
+
+    @type('float64')
+    opacity: number;
 
     constructor(partialMaterial?: Partial<Material>) {
         super();

@@ -63,6 +63,8 @@ var config = {
   plugins: plugins,
   devServer: {
     contentBase: path.join(__dirname, '../build/public'),
+    http2: false,
+    https: true,
     compress: true,
     port: 3000,
     host: '0.0.0.0',
@@ -70,8 +72,9 @@ var config = {
     disableHostCheck: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
-        pathRewrite: {'^/api' : ''}
+        target: 'https://0.0.0.0:8080',
+        pathRewrite: {'^/api' : ''},
+        secure: false,
       }
     },
   }
