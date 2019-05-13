@@ -1,9 +1,8 @@
 
 export class SoundDto {
     id: number;
-    distanceModel: number;
-    position: number;
+    distanceModelId: number;
     spatialized: boolean;
-    active: boolean;
-    loop: boolean;
+    maxDistance: number;
+    playbackRate: number;
 }

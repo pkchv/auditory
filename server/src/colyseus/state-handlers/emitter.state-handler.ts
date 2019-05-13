@@ -1,5 +1,6 @@
 import { MapSchema } from '@colyseus/schema';
 import { Logger } from '@nestjs/common';
+import * as _ from 'lodash';
 
 import { Emitter } from '../../entities/emitter.entity';
 import { StateHandler } from './base.state-handler';
@@ -33,6 +34,11 @@ export class EmitterStateHandler implements StateHandler<string, Emitter> {
     remove(uuid: string): void {
         this.logger.log(`[${uuid}] Emitter removed from universe`);
         delete this.emitters[uuid];
+    }
+
+    random_id(): string {
+        const keys = Array.from(this.emitters._indexes.keys());
+        return _.sample(keys);
     }
 
 }

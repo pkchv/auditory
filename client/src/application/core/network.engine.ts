@@ -1,11 +1,11 @@
 import * as Colyseus from 'colyseus.js';
 
-import { IConfigServer } from './interfaces/IConfigServer';
-import { createUrl } from './utility/create-url';
+import { IConfigServer } from '../interface/IConfigServer';
+import { createUrl } from '../utility/create-url';
 
-type EntityType = "players" | "emitters" | "sounds" | "lights"
-type ListenerType = "onChange" | "onAdd" | "onRemove"
-type ListenerCallback<T> = (instance: T, key: string | number) => void
+export type EntityType = "players" | "emitters" | "lights"
+export type ListenerType = "onChange" | "onAdd" | "onRemove"
+export type ListenerCallback<Id, Entity> = (instance: Entity, id: Id) => void
 
 export class Network {
 
@@ -58,8 +58,10 @@ export class Network {
         });
     }
 
-    attachRoomListener<T>(type: ListenerType, entity: EntityType, callback: ListenerCallback<T>) {
-        this.room.state[entity][type] = callback;
+    attachRoomListener<Id, Entity>(type: ListenerType, entity: EntityType, callback: ListenerCallback<Id, Entity>) {
+        this.room.onJoin.addOnce(() => {
+            this.room.state[entity][type] = callback;
+        })
     }
 
     getClientRef(): Colyseus.Client {

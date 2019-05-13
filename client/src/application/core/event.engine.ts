@@ -1,8 +1,7 @@
-import { Sound } from 'babylonjs';
-import { Network } from './Network';
-import { Vector3Dto } from './dto/vector3.dto';
-import { Action } from './message/action.message';
-import { Movement } from './message/movement.message';
+import { Vector3Dto } from '../dto/vector3.dto';
+import { Action } from '../message/action.message';
+import { Movement } from '../message/movement.message';
+import { Network } from './network.engine';
 
 export class EventEngine {
 

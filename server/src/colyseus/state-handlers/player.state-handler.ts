@@ -3,9 +3,11 @@ import { Player } from 'src/entities/player.entity';
 
 import { StateHandler } from './base.state-handler';
 import { Logger } from '@nestjs/common';
+import { PlayerFactory } from '../factory/player.factory';
 
 export class PlayerStateHandler implements StateHandler<string, Player> {
 
+    private readonly _factory = new PlayerFactory();
     private readonly logger: Logger = new Logger(PlayerStateHandler.name);
 
     constructor(
@@ -13,7 +15,7 @@ export class PlayerStateHandler implements StateHandler<string, Player> {
     ) {}
 
     create(clientId: string, partialPlayer?: Partial<Player>): Player {
-        const player = new Player(partialPlayer);
+        const player = this._factory.random();
         this.logger.log(`[${clientId}] [${player.name}] Player state added to universe`);
         this.players[clientId] = player;
         return player;

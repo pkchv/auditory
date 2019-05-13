@@ -1,5 +1,6 @@
 import { MapSchema } from '@colyseus/schema';
 import { Logger } from '@nestjs/common';
+import * as _ from 'lodash';
 
 import { Sound } from '../../entities/sound.entity';
 import { StateHandler } from './base.state-handler';
@@ -33,6 +34,12 @@ export class SoundStateHandler implements StateHandler<number, Sound> {
     remove(id: number): void {
         this.logger.log(`[${id}] Sound removed from universe`);
         delete this.sounds[id];
+    }
+
+    random(): Sound {
+        const keys = Array.from(this.sounds._indexes.keys());
+        const key = _.sample(keys);
+        return this.sounds[key];
     }
 
 }

@@ -2,9 +2,9 @@ import 'babylonjs-materials';
 
 import { Color3, Color4, HemisphericLight, Mesh, MeshBuilder, Scene, Vector3, StandardMaterial } from 'babylonjs';
 
-import { createGridMaterial } from './utility/create-grid-material';
+import { createGridMaterial } from '../utility/create-grid-material';
 import { GridMaterial } from 'babylonjs-materials';
-import { IConfigSandbox } from './interfaces/IConfigSandbox';
+import { IConfigSandbox } from '../interface/IConfigSandbox';
 
 export class Sandbox {
 
@@ -39,6 +39,7 @@ export class Sandbox {
 
     private configureScene() {
         this.scene.clearColor = new Color4(0, 0.05, 0.2, 1.0);
+        this.scene['_sandboxSize'] = this.config.size;
     }
 
     private createLight() {
@@ -103,8 +104,8 @@ export class Sandbox {
                         mainColor: new Color3(0.1, 0.8, 0.9),
                         lineColor: new Color3(1, 1, 1),
                     })
-                    platform['interactive'] = true;
-                    platform['isPlatform'] = true;
+                    platform['_interactive'] = true;
+                    platform['_isPlatform'] = true;
                     platforms.push(platform);
                 }
             }

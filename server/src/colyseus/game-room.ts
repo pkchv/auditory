@@ -14,8 +14,20 @@ export class GameRoom extends Room<Universe> {
     private readonly logger: Logger = new Logger(GameRoom.name);
 
     maxClients: number = 8;
-    handler: UniverseStateHandler;
-    simulation: Simulation;
+    patchRate: number = 50;
+
+    state: Universe;
+    _stateHandler: UniverseStateHandler;
+    _simulator: Simulation;
+
+    constructor() {
+        super();
+        this.state = new Universe();
+        this.setState(this.state);
+        this._stateHandler = new UniverseStateHandler(this.state);
+        this._simulator = new Simulation(this.clock, this._stateHandler);
+        this._simulator.init();
+    }
 
     onInit(options) {
         if (options.maxClients !== undefined) {
@@ -23,10 +35,12 @@ export class GameRoom extends Room<Universe> {
         }
 
         this.setSimulationInterval(() => this.onUpdate());
-        const universe = new Universe();
-        this.setState(universe);
-        this.handler = new UniverseStateHandler(universe);
-        this.simulation = new Simulation(this.handler);
+        // const universe = new Universe();
+        // this.setState(universe);
+        // this.handler = new UniverseStateHandler(universe);
+        // this.simulation = new Simulation(this.clock, this.handler);
+        // this.simulation.init();
+
     }
 
     requestJoin(options) {
@@ -39,16 +53,16 @@ export class GameRoom extends Room<Universe> {
     }
 
     onJoin(client) {
-        this.handler.players.create(client.id);
+        this._stateHandler.players.create(client.id);
     }
 
     onAction(client: Client, action: Action) {
         this.broadcast(action, { except: client });
-        this.simulation.onBroadcast(action);
+        this._simulator.onAction(client.id, action);
     }
 
     onMovement(client: Client, movement: Movement) {
-        this.simulation.onStateChange(client.id, movement);
+        this._simulator.onMovement(client.id, movement);
     }
 
     onMessage(client: Client, data: Movement | Action) {
@@ -67,11 +81,11 @@ export class GameRoom extends Room<Universe> {
     }
 
     onUpdate() {
-        this.handler.update();
+        this._simulator.update();
     }
 
     onLeave(client) {
-        this.handler.players.remove(client.id);
+        this._stateHandler.players.remove(client.id);
     }
 
 }

@@ -1,32 +1,46 @@
 import { AbstractMesh, Color3, Engine, MeshBuilder, Scene, Vector3, VRExperienceHelper } from 'babylonjs';
 
-import { Assets } from './Assets';
-import { AudioEngine } from './AudioEngine';
+import { CameraController } from './controller/camera.controller';
+import { EmitterController } from './controller/emitter.controller';
+import { LightController } from './controller/light.controller';
+import { PlayerController } from './controller/player.controller';
+import { Assets } from './core/assets.engine';
+import { AudioEngine } from './core/audio.engine';
+import { EventEngine } from './core/event.engine';
+import { Network } from './core/network.engine';
+import { Sandbox } from './core/sandbox';
+import { StateEngine } from './core/state.engine';
 import { Vector3Dto } from './dto/vector3.dto';
-import { EventEngine } from './EventEngine';
-import { Input } from './Input';
-import { IConfig } from './interfaces/IConfig';
-import { Network } from './Network';
-import { Sandbox } from './Sandbox';
+import { IConfig } from './interface/IConfig';
+import { Action } from './message/action.message';
+import { EmitterStateHandler } from './state-handler/emitter-state-handler';
+import { LightStateHandler } from './state-handler/light.state-handler';
+import { PlayerStateHandler } from './state-handler/player.state-handler';
 import { createGridMaterial } from './utility/create-grid-material';
 import { getId } from './utility/get-mesh-id';
 import { toVector3 } from './utility/to-vector3';
-import { fromVector3 } from './utility/from-vector3';
-import { PlaybackDto } from './dto/playback.dto';
-import { Action } from '../../../server/src/colyseus/dto/action.message';
 
 export class App {
 
     private readonly engine: Engine;
-    private readonly scene: Scene;
-    private readonly network: Network;
     private readonly assets: Assets;
+    private readonly network: Network;
     private readonly audio: AudioEngine;
     private readonly event: EventEngine;
-    private readonly input: Input;
+    private readonly state: StateEngine;
 
+    private readonly scene: Scene;
     private sandbox: Sandbox;
     private vr: VRExperienceHelper;
+
+    private readonly camera: CameraController;
+    private readonly emitters: EmitterController;
+    private readonly lights: LightController;
+    private readonly players: PlayerController;
+
+    private readonly emitterState: EmitterStateHandler;
+    private readonly lightState: LightStateHandler;
+    private readonly playerState: PlayerStateHandler;
 
     private get canvas(): HTMLCanvasElement {
         return <HTMLCanvasElement> document.getElementById(this.elementId);
@@ -36,13 +50,35 @@ export class App {
         private readonly elementId: string,
         private readonly config: IConfig,
     ) {
+        // TODO: object injection...
+
+        // game engine
         this.engine = new Engine(this.canvas, true);
         this.scene = new Scene(this.engine);
+
+        // core services
         this.network = new Network(config.server);
         this.assets = new Assets(this.scene, this.config.assets);
         this.audio = new AudioEngine(this.assets.sounds);
         this.event = new EventEngine(this.network);
-        this.input = new Input();
+
+        // controllers
+        this.camera = new CameraController();
+        this.emitters = new EmitterController(this.scene);
+        this.lights = new LightController();
+        this.players = new PlayerController(this.scene);
+
+        // state handlers
+        this.emitterState = new EmitterStateHandler(this.emitters);
+        this.lightState = new LightStateHandler(this.lights);
+        this.playerState = new PlayerStateHandler(this.players);
+
+        this.state = new StateEngine(
+            this.network,
+            this.playerState,
+            this.emitterState,
+            this.lightState
+        );
     }
 
     initialize(): void {
@@ -50,7 +86,8 @@ export class App {
         this.initScene();
         this.initSandbox();
         this.initWebVR();
-        this.initStateHandlers();
+        this.state.initStateHandlers();
+        this.initMessageHandlers();
     }
 
     async loadAssets() {
@@ -64,7 +101,7 @@ export class App {
 
     run(): void {
         this.assets.setOnFinish(() => {
-            this.engine.runRenderLoop(() => this.scene.render(true))
+            this.engine.runRenderLoop(() => this.scene.render())
         });
     }
 
@@ -93,25 +130,31 @@ export class App {
 
         this.vr.enableInteractions();
         this.vr.raySelectionPredicate = () => true
-        this.vr.meshSelectionPredicate = (mesh) => mesh['interactive'] || false
+        this.vr.meshSelectionPredicate = (mesh) => mesh['_interactive'] || false
         this.vr.changeLaserColor(new Color3(85.0, 0, 0));
 
         this.vr.onNewMeshSelected.add((mesh: AbstractMesh) => {
-            if (mesh['isPlatform'] !== true && mesh.name !== this.sandbox.floor.name) {
+            if (mesh['_isPlatform'] !== true && mesh.name !== this.sandbox.floor.name) {
+                console.log('mesh picked', getId(mesh), mesh.position);
                 this.event.action(getId(mesh), mesh.position);
+                const sound = this.emitters._sound.get(mesh.name);
+                this.audio.play(mesh.position, sound);
+
+/*
                 this.audio.play(new PlaybackDto({
                     id: 1,
                     position: fromVector3(mesh.position),
                 }));
+*/
             }
         });
 
         this.vr.onNewMeshPicked.add((pickingInfo) => {
-            if (pickingInfo.pickedMesh['isPlatform'] === true) {
+            if (pickingInfo.pickedMesh['_isPlatform'] === true) {
                 const { x, z } = pickingInfo.pickedPoint;
                 const y = this.scene.activeCamera.position.y;
                 const position = new Vector3Dto({ x, y, z })
-                this.input.move(this.scene.activeCamera, position);
+                this.camera.move(this.scene.activeCamera, position);
                 this.event.movement(position);
             }
         });
@@ -170,12 +213,11 @@ export class App {
         camera.attachControl(this.canvas);
     }
 
-    private initStateHandlers() {
+    private initMessageHandlers() {
         this.network.onMessage(({ data: { meshId, position }}: Action) => {
-            this.audio.play(new PlaybackDto({
-                id: 2,
-                position: toVector3(position),
-            }));
+            console.log(meshId, position);
+            const sound = this.emitters._sound.get(meshId);
+            this.audio.play(position, sound);
         })
     }
 

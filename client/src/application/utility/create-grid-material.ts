@@ -1,7 +1,8 @@
-import * as uuid from 'uuid/v1';
 import { Color3, Scene } from 'babylonjs';
 import { GridMaterial } from 'babylonjs-materials';
-import { IGridMaterialDef } from '../interfaces/IGridMaterialDef';
+import * as uuid from 'uuid/v1';
+
+import { IGridMaterialDef } from '../interface/IGridMaterialDef';
 
 const random = require('random');
 

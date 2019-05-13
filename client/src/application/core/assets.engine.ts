@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { AssetsManager, Scene, AbstractAssetTask, BinaryFileAssetTask, Sound } from 'babylonjs';
+import { AbstractAssetTask, AssetsManager, BinaryFileAssetTask, Scene, Sound } from 'babylonjs';
 
-import { IConfigAssets } from './interfaces/IConfigAssets';
-import { AssetDto } from './dto/asset.dto';
-import { createUrl } from './utility/create-url';
+import { AssetDto } from '../dto/asset.dto';
+import { IConfigAssets } from '../interface/IConfigAssets';
+import { createUrl } from '../utility/create-url';
 
 type TResourceType = 'sound' | 'mesh' | 'color'
 export class Assets extends AssetsManager {

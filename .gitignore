@@ -2,3 +2,4 @@ node_modules/
 /build/*
 cert/*
 !cert/generate.sh
+server/src/asset-store/**

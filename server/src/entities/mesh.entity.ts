@@ -10,14 +10,17 @@ export class Mesh extends Schema {
     @type('boolean')
     abstract: boolean = true;
 
+    @type('float64')
+    width: number = 0.08;
+
+    @type('float64')
+    height: number = 0.08;
+
     @type(Vector3)
     position: Vector3 = new Vector3();
 
     @type(Vector3)
-    rotationAxis: Vector3 = new Vector3();
-
-    @type('float64')
-    angle: number = 0.0;
+    rotation: Vector3 = new Vector3();
 
     constructor(partialMesh?: Partial<Mesh>) {
         super();
