@@ -30,7 +30,7 @@
     "@types/mz": "0.0.32",
     "colyseus": "^0.10.5",
     "lodash": "^4.17.11",
-    "mathjs": "^5.10.0",
+    "mathjs": "^7.5.1",
     "mz": "^2.7.0",
     "namor": "^1.1.2",
     "nestjs-config": "^1.3.21",
