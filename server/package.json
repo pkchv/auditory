@@ -28,7 +28,7 @@
     "@types/lodash": "^4.14.126",
     "@types/mathjs": "^5.0.1",
     "@types/mz": "0.0.32",
-    "colyseus": "^0.10.5",
+    "colyseus": "^0.14.24",
     "lodash": "^4.17.11",
     "mathjs": "^5.10.0",
     "mz": "^2.7.0",
